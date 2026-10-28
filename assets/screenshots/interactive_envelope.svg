@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="600" height="360">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06132D"/>
+      <stop offset="50%" stop-color="#0B2559"/>
+      <stop offset="100%" stop-color="#081D45"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E5AB"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA7C11"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="360" rx="12" fill="url(#bgGrad)" stroke="#D4AF37" stroke-width="2"/>
+  <rect x="8" y="8" width="584" height="344" rx="8" fill="none" stroke="#F3E5AB" stroke-width="0.75" opacity="0.4"/>
+
+  <!-- Browser Header Bar -->
+  <rect x="16" y="16" width="568" height="38" rx="6" fill="rgba(2, 6, 23, 0.65)" stroke="rgba(212, 175, 55, 0.3)" stroke-width="1"/>
+  <circle cx="36" cy="35" r="5" fill="#EF4444" opacity="0.8"/>
+  <circle cx="52" cy="35" r="5" fill="#F59E0B" opacity="0.8"/>
+  <circle cx="68" cy="35" r="5" fill="#10B981" opacity="0.8"/>
+  <text x="88" y="40" fill="#CBD5E1" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" letter-spacing="0.5">HARSH &amp; MONIKA &bull; WEDDING INVITATION</text>
+
+  <!-- Central Visual Illustration -->
+  <circle cx="300" cy="168" r="50" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="300" cy="168" r="42" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <circle cx="300" cy="168" r="12" fill="url(#goldGrad)"/>
+  <text x="300" y="175" font-size="22" text-anchor="middle">✉️</text>
+
+  <!-- Decorative Spoke Accents -->
+  <line x1="300" y1="118" x2="300" y2="218" stroke="#D4AF37" stroke-width="1" opacity="0.3"/>
+  <line x1="250" y1="168" x2="350" y2="168" stroke="#D4AF37" stroke-width="1" opacity="0.3"/>
+
+  <!-- Title & Subtitle -->
+  <text x="300" y="290" fill="url(#goldGrad)" font-family="Georgia, serif" font-size="19" font-weight="bold" text-anchor="middle" letter-spacing="0.5">Ceremonial 3D Envelope</text>
+  <text x="300" y="312" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" text-anchor="middle">Gold & Royal Blue Wax Seal Unfolding Card</text>
+  <text x="300" y="332" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" text-anchor="middle" font-style="italic">Interactive Flip Motion &bull; GSAP Recalculation &bull; Auspicious Chimes</text>
+</svg>
