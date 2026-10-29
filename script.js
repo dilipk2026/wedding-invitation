@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * HARSH & MONIKA — SACRED BUDDHIST WEDDING INVITATION WEBSITE
+ * MONIKA & HARSH — SACRED BUDDHIST WEDDING INVITATION WEBSITE
  * Pure HTML5, CSS3 & Vanilla JavaScript
  * Zero External Frameworks & Zero Build Steps Required
  * Deployable directly on GitHub Pages
@@ -17,10 +17,10 @@
 const CONFIG = {
   // Couple Information
   couple: {
-    groom: "Harsh",
-    groomHindi: "हर्ष",
     bride: "Monika",
     brideHindi: "मोनिका",
+    groom: "Harsh",
+    groomHindi: "हर्ष",
     invitingFamily: "Both Families",
     invitingFamilyHindi: "समस्त परिवार",
     weddingDateFormatted: "Wednesday, 25 November 2026",
@@ -42,7 +42,7 @@ const CONFIG = {
   // Provide verified phone number with country code (e.g. 919876543210 for India +91)
   // Do not include '+', spaces, brackets, or dashes
   whatsAppContactNumber: "916398334625",
-  whatsAppContactMessage: "Namaste! We received the wedding invitation for Harsh & Monika. Sending our warmest blessings to the couple and family!",
+  whatsAppContactMessage: "Namaste! We received the wedding invitation for Monika & Harsh. Sending our warmest blessings to the couple and family!",
 
   // Resolve WhatsApp Contact URL
   getWhatsAppContactUrl() {
@@ -836,12 +836,12 @@ const DownloadInvitationController = {
         const posY = (pageHeight - cardH) / 2;
 
         pdf.addImage(imgData, 'JPEG', posX, posY, cardW, cardH, undefined, 'FAST');
-        pdf.save('Harsh-and-Monika-Wedding-Invitation.pdf');
+        pdf.save('Monika-and-Harsh-Wedding-Invitation.pdf');
       } else if (typeof html2pdf !== 'undefined') {
         const card = document.getElementById('printableInvitationCard');
         const opt = {
           margin: 10,
-          filename: 'Harsh-and-Monika-Wedding-Invitation.pdf',
+          filename: 'Monika-and-Harsh-Wedding-Invitation.pdf',
           image: { type: 'jpeg', quality: 0.95 },
           html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, backgroundColor: '#0A2252' },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -883,7 +883,7 @@ const DownloadInvitationController = {
       const imageUri = canvas.toDataURL('image/png');
 
       const downloadLink = document.createElement('a');
-      downloadLink.download = 'Harsh-and-Monika-Wedding-Invitation.png';
+      downloadLink.download = 'Monika-and-Harsh-Wedding-Invitation.png';
       downloadLink.href = imageUri;
       document.body.appendChild(downloadLink);
       downloadLink.click();
@@ -937,6 +937,8 @@ const AutoScrollController = {
   reducedMotion: false,
   inactivityTimer: null,
   inactivityDelay: 5000, // Exactly 5 seconds of stillness before auto-resuming
+  bottomRestartTimer: null,
+  bottomRestartDelay: 45000, // Wait 45 seconds at the bottom before restarting from top
 
   init() {
     // Check accessibility: prefers-reduced-motion
@@ -993,6 +995,13 @@ const AutoScrollController = {
       return;
     }
 
+    // Check if user moved away from bottom manually
+    if (this.isAtBottom && !this.checkBottom()) {
+      this.isAtBottom = false;
+      clearTimeout(this.bottomRestartTimer);
+      this.isPlaying = true;
+    }
+
     // Pause immediately on user click, touch, or manual scroll
     if (this.isPlaying && !this.isPaused) {
       this.pause();
@@ -1011,6 +1020,7 @@ const AutoScrollController = {
 
   start() {
     clearTimeout(this.inactivityTimer);
+    clearTimeout(this.bottomRestartTimer);
 
     // If at bottom, restart from top
     if (this.checkBottom()) {
@@ -1040,6 +1050,7 @@ const AutoScrollController = {
 
   resume() {
     clearTimeout(this.inactivityTimer);
+    clearTimeout(this.bottomRestartTimer);
 
     if (!this.isPlaying) {
       this.start();
@@ -1062,6 +1073,7 @@ const AutoScrollController = {
 
   stop(finished = false) {
     clearTimeout(this.inactivityTimer);
+    clearTimeout(this.bottomRestartTimer);
     this.isPlaying = false;
     this.isPaused = false;
     cancelAnimationFrame(this.animId);
@@ -1070,12 +1082,12 @@ const AutoScrollController = {
 
     if (finished) {
       this.isAtBottom = true;
-      // After reaching the bottom, wait 5 seconds then gently rewind to top and restart
-      setTimeout(() => {
+      // After reaching the bottom, wait 45 seconds then gently rewind to top and restart
+      this.bottomRestartTimer = setTimeout(() => {
         if (this.isAtBottom) {
           this.restartFromTop();
         }
-      }, 5000);
+      }, this.bottomRestartDelay);
     }
   },
 
@@ -1111,6 +1123,7 @@ const AutoScrollController = {
   },
 
   restartFromTop() {
+    clearTimeout(this.bottomRestartTimer);
     // Cancel any existing animation frame (isPlaying may be false here)
     cancelAnimationFrame(this.animId);
     this.animId = null;
@@ -1198,9 +1211,9 @@ const ShareController = {
   },
 
   shareWhatsApp(url) {
-    const message = `🌸 *Wedding Invitation — Harsh & Monika* 🌸\n\n` +
+    const message = `🌸 *Wedding Invitation — Monika & Harsh* 🌸\n\n` +
       `॥ नमो बुद्धाय ॥\n\n` +
-      `With the blessings of the Triple Gem, both families warmly invite you to celebrate the sacred wedding of *Harsh & Monika*.\n\n` +
+      `With the blessings of the Triple Gem, both families warmly invite you to celebrate the sacred wedding of *Monika & Harsh*.\n\n` +
       `📅 *Date:* Wednesday, 25 November 2026\n` +
       `⏰ *Time:* 7:00 PM IST\n` +
       `🏛️ *Venue:* THE ROYAL AVENUE\n` +
@@ -1266,7 +1279,7 @@ const ShareController = {
     // Couple Names
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "bold 38px 'Cinzel', serif";
-    ctx.fillText(`${CONFIG.couple.groom} & ${CONFIG.couple.bride}`, 325, 145);
+    ctx.fillText(`${CONFIG.couple.bride} & ${CONFIG.couple.groom}`, 325, 145);
 
     // Date & Venue
     ctx.fillStyle = "#F3E5AB";
@@ -1298,7 +1311,7 @@ const ShareController = {
       ctx.fillText("🌸 Sabbe Satta Sukhi Hontu 🌸", 325, 695);
 
       const link = document.createElement('a');
-      link.download = `Harsh-Monika-Wedding-QR.png`;
+      link.download = `Monika-Harsh-Wedding-QR.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       this.showToast("QR Keepsake downloaded!");
@@ -1345,10 +1358,10 @@ const CalendarController = {
     const startIso = "20261125T133000Z";
     const endIso = "20261125T180000Z";
 
-    const title = encodeURIComponent(`Wedding of ${CONFIG.couple.groom} & ${CONFIG.couple.bride}`);
+    const title = encodeURIComponent(`Wedding of ${CONFIG.couple.bride} & ${CONFIG.couple.groom}`);
     const details = encodeURIComponent(
       `॥ नमो बुद्धाय ॥\n\n` +
-      `With the blessings of the Triple Gem, both families warmly invite you to the sacred Buddhist wedding ceremony and celebration of Harsh & Monika.\n\n` +
+      `With the blessings of the Triple Gem, both families warmly invite you to the sacred Buddhist wedding ceremony and celebration of Monika & Harsh.\n\n` +
       `Venue: ${CONFIG.couple.venueName}\n` +
       `Address: ${CONFIG.couple.venueFullAddress}\n` +
       `Time: ${CONFIG.couple.weddingTimeFormatted}\n\n` +
@@ -1364,16 +1377,16 @@ const CalendarController = {
     const icsContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Harsh & Monika Wedding Invitation//EN",
+      "PRODID:-//Monika & Harsh Wedding Invitation//EN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       "BEGIN:VEVENT",
-      "UID:harsh-monika-wedding-20261125@aligarh",
+      "UID:monika-harsh-wedding-20261125@aligarh",
       "DTSTAMP:20261125T000000Z",
       "DTSTART:20261125T133000Z",
       "DTEND:20261125T180000Z",
-      `SUMMARY:Wedding of ${CONFIG.couple.groom} & ${CONFIG.couple.bride}`,
-      `DESCRIPTION:Sacred Buddhist Wedding Ceremony and Celebration of Harsh & Monika. With the blessings of the Triple Gem.\\nVenue: ${CONFIG.couple.venueName}, ${CONFIG.couple.venueFullAddress}`,
+      `SUMMARY:Wedding of ${CONFIG.couple.bride} & ${CONFIG.couple.groom}`,
+      `DESCRIPTION:Sacred Buddhist Wedding Ceremony and Celebration of Monika & Harsh. With the blessings of the Triple Gem.\\nVenue: ${CONFIG.couple.venueName}, ${CONFIG.couple.venueFullAddress}`,
       `LOCATION:${CONFIG.couple.venueName}\\, ${CONFIG.couple.venueFullAddress}`,
       "STATUS:CONFIRMED",
       "END:VEVENT",
@@ -1383,7 +1396,7 @@ const CalendarController = {
     const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-    link.setAttribute("download", "Harsh-Monika-Wedding.ics");
+    link.setAttribute("download", "Monika-Harsh-Wedding.ics");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2085,14 +2098,14 @@ const RingsThreeSceneController = {
       emissiveIntensity: 0.2
     });
 
-    // Ring 1 (Groom - Harsh)
+    // Ring 1 (Bride - Monika)
     const ringGeo1 = new THREE.TorusGeometry(1.5, 0.22, 28, 64);
     const ring1 = new THREE.Mesh(ringGeo1, ringMaterial);
     ring1.position.set(-0.75, 0, 0);
     ring1.rotation.set(0.5, 0.6, 0.2);
     this.ringsGroup.add(ring1);
 
-    // Ring 2 (Bride - Monika) — Intertwined through Ring 1
+    // Ring 2 (Groom - Harsh) — Intertwined through Ring 1
     const ringGeo2 = new THREE.TorusGeometry(1.5, 0.22, 28, 64);
     const ring2 = new THREE.Mesh(ringGeo2, ringMaterial);
     ring2.position.set(0.75, 0, 0);

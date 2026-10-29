@@ -1,6 +1,6 @@
 <div align="center">
 
-# ☸️ Harsh & Monika — Sacred Buddhist Wedding Invitation
+# ☸️ Monika & Harsh — Sacred Buddhist Wedding Invitation
 ### 🌸 Two Hearts • One Sacred Path • A Lifetime of Compassion 🌸
 
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
@@ -17,7 +17,7 @@
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════╗
-║   Groom: Harsh  💍  Bride: Monika  •  Date: Wednesday, 25 November 2026       ║
+║   Bride: Monika  💍  Groom: Harsh  •  Date: Wednesday, 25 November 2026       ║
 ║   Venue: THE ROYAL AVENUE, Beside Vijay Farms, Bhadesi Mafi, Aligarh, UP      ║
 ║   Theme: Royal Blue (#0B2559) • Warm Gold (#D4AF37) • Pure White              ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -35,7 +35,7 @@
 
 ## 🌟 Project Overview
 
-**Harsh & Monika Wedding Invitation** is a luxury, mobile-first digital wedding invitation web application designed with an authentic Indian Buddhist aesthetic. Built entirely using **pure HTML5, CSS3, and Vanilla JavaScript**, it incorporates cinema-grade **Three.js 3D web graphics**, **GSAP & ScrollTrigger reveal transitions**, a **procedural Web Audio API sound synthesizer** (with HTML5 MP3 fallback playing `chanakya.mp3`), **direct 1-tap WhatsApp contact**, **keepsake invitation download as print-ready PDF and high-res PNG image**, and **cinematic slow automatic scrolling** that pauses on user interaction and auto-resumes after 5 seconds.
+**Monika & Harsh Wedding Invitation** is a luxury, mobile-first digital wedding invitation web application designed with an authentic Indian Buddhist aesthetic. Built entirely using **pure HTML5, CSS3, and Vanilla JavaScript**, it incorporates cinema-grade **Three.js 3D web graphics**, **GSAP & ScrollTrigger reveal transitions**, a **procedural Web Audio API sound synthesizer** (with HTML5 MP3 fallback playing `chanakya.mp3`), **direct 1-tap WhatsApp contact**, **keepsake invitation download as print-ready PDF and high-res PNG image**, and **cinematic slow automatic scrolling** that pauses on user interaction, auto-resumes after 5 seconds, and waits 45 seconds at the bottom before smoothly restarting from the top.
 
 > [!NOTE]
 > **Zero Framework Bloat:** The entire project requires **0 npm dependencies**, **0 build tools**, and **0 bundling steps**. It can be served from any static file server or deployed with a single push directly to **GitHub Pages**.
@@ -102,7 +102,7 @@
 * **Battery & GPU Throttling:** Detects viewport width < 640px to adjust camera position (z=22), scale down the Chakra to 0.65, and disable antialiasing. Uses `IntersectionObserver` and `visibilitychange` to suspend `requestAnimationFrame` whenever the hero is offscreen or when switching tabs.
 
 ### 2. 💍 3D Intertwined Wedding Rings Scene (`RingsThreeSceneController`)
-* **24K Polished Gold PBR Material:** Two interlocked metallic gold rings (representing Harsh & Monika) featuring realistic specular reflections.
+* **24K Polished Gold PBR Material:** Two interlocked metallic gold rings (representing Monika & Harsh) featuring realistic specular reflections.
 * **Multi-Axis Rotation:** Smooth continuous rotation with realistic gleam.
 * **Orientation Awareness:** Automatically re-adjusts aspect ratio and camera depth upon device rotation.
 
@@ -141,7 +141,7 @@
 * **Gentle Reading Pace:** Silky smooth automatic scrolling (~38 pixels/sec) powered by `requestAnimationFrame` with frame-rate-independent delta time.
 * **Instant Pause on Interaction:** Immediately pauses on any click, touch, swipe, mouse wheel, or keyboard navigation key.
 * **Auto-Resume:** Automatically resumes scrolling after **5 seconds** of complete user inactivity.
-* **Bottom Detection & Restart:** Detects the bottom of the page, waits 5 seconds, then smoothly scrolls back to the top and restarts.
+* **Bottom Detection & Restart:** Detects the bottom of the page, waits 45 seconds, then smoothly scrolls back to the top and restarts.
 * **Accessibility First:** Fully disabled when `prefers-reduced-motion: reduce` is set.
 
 ### 9. 👨‍💻 Creator Attribution Footer (`CreatorController`)
@@ -246,9 +246,9 @@ sequenceDiagram
     
     alt PDF Export Selected
         UI->>PDF: Creates A4 document with royal navy fill & centered card
-        PDF-->>Guest: Triggers Harsh-and-Monika-Wedding-Invitation.pdf download
+        PDF-->>Guest: Triggers Monika-and-Harsh-Wedding-Invitation.pdf download
     else Image Export Selected
-        UI-->>Guest: Triggers Harsh-and-Monika-Wedding-Invitation.png download
+        UI-->>Guest: Triggers Monika-and-Harsh-Wedding-Invitation.png download
     end
 
     UI->>Synth: Plays 528 Hz auspicious temple bell chime
@@ -336,7 +336,7 @@ The website features direct 1-tap WhatsApp contact for enquiries and blessings. 
      // Provide verified phone number with country code (e.g. 919876543210 for India +91)
      // Do not include '+', spaces, brackets, or dashes
      whatsAppContactNumber: "916398334625",
-     whatsAppContactMessage: "Namaste! We received the wedding invitation for Harsh & Monika. Sending our warmest blessings to the couple and family!",
+     whatsAppContactMessage: "Namaste! We received the wedding invitation for Monika & Harsh. Sending our warmest blessings to the couple and family!",
      // ...
    };
    ```
@@ -399,7 +399,7 @@ git init
 
 # 2. Stage and commit all files
 git add .
-git commit -m "feat: Harsh & Monika luxury 3D Buddhist wedding invitation website"
+git commit -m "feat: Monika & Harsh luxury 3D Buddhist wedding invitation website"
 
 # 3. Create your main branch and attach your remote repository
 git branch -M main
@@ -537,7 +537,7 @@ Open <code>script.js</code>, find <code>whatsAppContactNumber</code> in the <cod
 ## 📜 License & Acknowledgements
 
 * **License:** Released under the [MIT License](LICENSE).
-* **Couple Information:** Harsh (हर्ष) & Monika (मोनिका) • Wednesday, 25 November 2026 • Aligarh, Uttar Pradesh.
+* **Couple Information:** Monika (मोनिका) & Harsh (हर्ष) • Wednesday, 25 November 2026 • Aligarh, Uttar Pradesh.
 * **Cultural Iconography:** Created with the utmost reverence for Buddhist traditions, the Triple Gem (Buddha, Dhamma, Sangha), and the Ashoka Chakra.
 * **Creator:** Designed & Developed with ❤️ by **Dilip** — [GitHub](https://github.com/dilipk2026)
 * **Libraries Used:** [Three.js](https://threejs.org/) • [GSAP & ScrollTrigger](https://greensock.com/) • [jsPDF](https://github.com/parallax/jsPDF) • [html2canvas](https://html2canvas.hertzen.com/) • [QRCode.js](https://davidshimjs.github.io/qrcodejs/).
@@ -553,6 +553,6 @@ May all beings be happy, peaceful, and liberated.
 
 <br />
 
-[🔼 Back to Top](#️-harsh--monika--sacred-buddhist-wedding-invitation)
+[🔼 Back to Top](#️-monika--harsh--sacred-buddhist-wedding-invitation)
 
 </div>
