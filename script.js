@@ -38,9 +38,28 @@ const CONFIG = {
   // Wedding Date & Time for Countdown Timer (ISO 8601 string in IST UTC+5:30)
   weddingDateIso: "2026-11-25T19:00:00+05:30",
 
-  // Google Sheets RSVP Integration Endpoint
-  // Deployed Google Apps Script Web App URL
-  googleSheetsRsvpUrl: "https://script.google.com/macros/s/AKfycbzVSHCZvRSXW_uIH3JBv0mhgX_bbt0iagCqrbrjpOw_MPi7Wnd2MPu9O93lsq2nSgEa/exec",
+  // WhatsApp Contact Configuration
+  // Provide verified phone number with country code (e.g. 919876543210 for India +91)
+  // Do not include '+', spaces, brackets, or dashes
+  whatsAppContactNumber: "916398334625",
+  whatsAppContactMessage: "Namaste! We received the wedding invitation for Harsh & Monika. Sending our warmest blessings to the couple and family!",
+
+  // Resolve WhatsApp Contact URL
+  getWhatsAppContactUrl() {
+    const cleanNumber = (this.whatsAppContactNumber || "").replace(/[^0-9]/g, "");
+    const msg = encodeURIComponent(this.whatsAppContactMessage || "");
+    return `https://wa.me/${cleanNumber}?text=${msg}`;
+  },
+
+  // Creator Details Configuration
+  // Enter creator name and optional social links. Empty links are automatically hidden.
+  creator: {
+    name: "A.K. Bardhan", // Replace with your name or brand
+    role: "Designed & Developed with ❤️",
+    github: "https://github.com/dilipk2026",
+    portfolio: "",
+    instagram: ""
+  },
 
   // Canonical URL for sharing:
   // If hosted on GitHub Pages (e.g. "https://username.github.io/wedding/"), set here
@@ -69,10 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
   AmbientCanvasController.init();
   CountdownController.init();
   EnvelopeCardController.init();
-  RSVPController.init();
+  WhatsAppContactController.init();
+  DownloadInvitationController.init();
+  AutoScrollController.init();
   ShareController.init();
   NavigationController.init();
   CalendarController.init();
+  CreatorController.init();
 });
 
 /* ==========================================================================
@@ -113,6 +135,15 @@ const OpeningScreenController = {
       const brand = document.querySelector('.nav-brand');
       if (brand) brand.focus();
     }, 800);
+
+    // Automatically begin gentle auto-scroll after welcoming the guest (unless reduced motion is preferred)
+    setTimeout(() => {
+      if (typeof AutoScrollController !== 'undefined' && !AutoScrollController.reducedMotion) {
+        if (!AutoScrollController.isPlaying) {
+          AutoScrollController.start();
+        }
+      }
+    }, 1800);
   }
 };
 
@@ -167,7 +198,11 @@ const SoundController = {
 
     this.html5Audio = document.getElementById('bgAudio');
     if (this.html5Audio) {
-      this.html5Audio.volume = 0.25; // 25% volume for HTML5 audio
+      if (!this.html5Audio.getAttribute('src')) {
+        this.html5Audio.src = 'assets/chanakya.mp3';
+      }
+      this.html5Audio.volume = 0.18;
+      this.html5Audio.loop = true;
     }
 
     toggleBtn.addEventListener('click', () => this.toggle());
@@ -179,7 +214,7 @@ const SoundController = {
       if (AudioContextClass) {
         this.audioCtx = new AudioContextClass();
         this.masterGain = this.audioCtx.createGain();
-        this.masterGain.gain.setValueAtTime(0.25, this.audioCtx.currentTime); // 25% volume
+        this.masterGain.gain.setValueAtTime(0.18, this.audioCtx.currentTime); // 18% volume
         this.masterGain.connect(this.audioCtx.destination);
       }
     }
@@ -190,18 +225,28 @@ const SoundController = {
 
   startAudio() {
     if (this.isPlaying) return;
-    this.initAudioContext();
-    if (!this.audioCtx) return;
 
-    this.isPlaying = true;
-    this.updateUI();
-
-    // If a valid MP3 file is placed in assets/buddhist_flute.mp3, use it
-    if (this.html5Audio && this.html5Audio.src && !this.html5Audio.src.endsWith('/') && !this.html5Audio.src.endsWith('.html')) {
-      this.html5Audio.play().catch(() => {
-        this.startJoyfulProceduralBGM();
+    if (this.html5Audio) {
+      if (!this.html5Audio.getAttribute('src')) {
+        this.html5Audio.src = 'assets/chanakya.mp3';
+      }
+      this.html5Audio.play().then(() => {
+        this.isPlaying = true;
+        this.updateUI();
+      }).catch((err) => {
+        console.warn('HTML5 audio play error, falling back to Web Audio:', err);
+        this.initAudioContext();
+        if (this.audioCtx) {
+          this.isPlaying = true;
+          this.updateUI();
+          this.startJoyfulProceduralBGM();
+        }
       });
     } else {
+      this.initAudioContext();
+      if (!this.audioCtx) return;
+      this.isPlaying = true;
+      this.updateUI();
       this.startJoyfulProceduralBGM();
     }
   },
@@ -498,7 +543,7 @@ const SoundController = {
   },
 
   /**
-   * Compatible bell helper for envelope and RSVP chime triggers
+   * Compatible bell helper for celebratory envelope, downloads, and action chime triggers
    */
   playSoftBell(freq = 540, dur = 3.5) {
     if (!this.audioCtx) {
@@ -604,265 +649,501 @@ const EnvelopeCardController = {
 };
 
 /* ==========================================================================
-   7. INTERACTIVE RSVP FORM & GOOGLE SHEETS INTEGRATION
+   7. WHATSAPP ENQUIRIES & BLESSINGS CONTROLLER
+   Direct connection to the families for wedding enquiries & warm wishes.
    ========================================================================== */
-const RSVPController = {
+const WhatsAppContactController = {
   init() {
-    const form = document.getElementById('rsvpForm');
-    const radioAccept = document.getElementById('radioAccept');
-    const radioDecline = document.getElementById('radioDecline');
-    const optAccept = document.getElementById('optionAccept');
-    const optDecline = document.getElementById('optionDecline');
-    const guestsGroup = document.getElementById('guestsCountGroup');
-    const demoBadge = document.getElementById('rsvpDemoBadge');
-    const editBtn = document.getElementById('btnEditRsvp');
+    const btnContact = document.getElementById('btnWhatsAppContact');
+    const btnCopy = document.getElementById('btnCopyWhatsAppNumber');
+    const numberDisplay = document.getElementById('whatsappNumberDisplay');
 
-    if (!form) return;
-
-    // Show Demo mode indicator if endpoint not configured
-    if (demoBadge) {
-      if (!CONFIG.googleSheetsRsvpUrl || CONFIG.googleSheetsRsvpUrl.trim() === '') {
-        demoBadge.style.display = 'block';
-      } else {
-        demoBadge.style.display = 'none';
+    // Display formatted contact number
+    if (numberDisplay && CONFIG.whatsAppContactNumber) {
+      const num = CONFIG.whatsAppContactNumber.replace(/[^0-9]/g, '');
+      if (num.length >= 10) {
+        const formatted = num.length === 12
+          ? `+${num.slice(0, 2)} ${num.slice(2, 7)} ${num.slice(7)}`
+          : `+${num}`;
+        numberDisplay.textContent = formatted;
       }
     }
 
-    // Attendance selection toggles (supports clicks and radio change events)
-    const updateAttendanceUI = (status) => {
-      if (status === 'accept') {
-        optAccept?.classList.add('selected');
-        optDecline?.classList.remove('selected');
-        if (radioAccept) radioAccept.checked = true;
-        if (guestsGroup) guestsGroup.style.display = 'block';
-      } else {
-        optDecline?.classList.add('selected');
-        optAccept?.classList.remove('selected');
-        if (radioDecline) radioDecline.checked = true;
-        if (guestsGroup) guestsGroup.style.display = 'none';
-      }
-    };
-
-    optAccept?.addEventListener('click', () => updateAttendanceUI('accept'));
-    optDecline?.addEventListener('click', () => updateAttendanceUI('decline'));
-    radioAccept?.addEventListener('change', () => updateAttendanceUI('accept'));
-    radioDecline?.addEventListener('change', () => updateAttendanceUI('decline'));
-
-    // Edit/Resubmit button listener
-    if (editBtn) {
-      editBtn.addEventListener('click', () => this.resetForm());
+    // Set dynamic WhatsApp URL
+    if (btnContact) {
+      btnContact.href = CONFIG.getWhatsAppContactUrl();
+      btnContact.addEventListener('click', () => {
+        SoundController.playSoftBell(576, 2.0);
+        AmbientCanvasController.burstPetals();
+      });
     }
 
-    // Check if already submitted on this device
-    const prevSubmitted = localStorage.getItem('harsh_monika_rsvp_submitted');
-    if (prevSubmitted) {
-      this.showAlreadySubmitted();
-    }
-
-    form.addEventListener('submit', (e) => this.handleSubmit(e));
-  },
-
-  resetTimer: null,
-  countdownInterval: null,
-
-  resetForm() {
-    if (this.resetTimer) {
-      clearTimeout(this.resetTimer);
-      this.resetTimer = null;
-    }
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-      this.countdownInterval = null;
-    }
-
-    localStorage.removeItem('harsh_monika_rsvp_submitted');
-
-    const formEl = document.getElementById('rsvpForm');
-    const successBox = document.getElementById('rsvpSuccessBox');
-    const submitBtn = document.getElementById('btnSubmitRsvp');
-    const editBtn = document.getElementById('btnEditRsvp');
-
-    if (formEl) {
-      formEl.reset();
-      formEl.style.display = 'flex';
-      // Reset radio cards to default ('accept' selected)
-      document.getElementById('optionAccept')?.classList.add('selected');
-      document.getElementById('optionDecline')?.classList.remove('selected');
-      const radioAccept = document.getElementById('radioAccept');
-      if (radioAccept) radioAccept.checked = true;
-      const guestsGroup = document.getElementById('guestsCountGroup');
-      if (guestsGroup) guestsGroup.style.display = 'block';
-    }
-
-    if (successBox) successBox.style.display = 'none';
-
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<span>Confirm RSVP &bull; उपस्थिति पुष्टि करें</span>`;
-    }
-
-    if (editBtn) {
-      editBtn.innerHTML = `Update Response / पुन: संशोधन करें`;
-    }
-  },
-
-  async handleSubmit(e) {
-    e.preventDefault();
-
-    const nameInput = document.getElementById('guestName');
-    const contactInput = document.getElementById('contactInfo');
-    const attendanceVal = document.querySelector('input[name="attendance"]:checked')?.value || 'accept';
-    const messageVal = document.getElementById('guestMessage')?.value || '';
-    const submitBtn = document.getElementById('btnSubmitRsvp');
-
-    const nameVal = nameInput ? nameInput.value.trim() : '';
-    const contactVal = contactInput ? contactInput.value.trim() : '';
-
-    // Validation: Name must be at least 2 characters
-    if (!nameVal || nameVal.length < 2) {
-      this.showMessage("Please enter your full name (कृपया अपना नाम दर्ज करें)", "error");
-      nameInput?.focus();
-      return;
-    }
-
-    // Validation: Phone (8-18 digits/plus/dashes) or valid email format
-    const isPhone = /^[0-9+\s\-().]{8,18}$/.test(contactVal);
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactVal);
-    if (!contactVal || (!isPhone && !isEmail)) {
-      this.showMessage("Please enter a valid phone number or email (कृपया सही फोन नंबर या ईमेल दर्ज करें)", "error");
-      contactInput?.focus();
-      return;
-    }
-
-    // Sanitize and clamp guest count between 1 and 20
-    const rawGuests = parseInt(document.getElementById('guestsCount')?.value || 1, 10);
-    const guestsCountVal = Math.max(1, Math.min(20, isNaN(rawGuests) ? 1 : rawGuests));
-
-    // Set Loading State
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Recording Your Blessing...</span>`;
-    }
-
-    const payload = {
-      guestName: nameVal,
-      contactInfo: contactVal,
-      attendance: attendanceVal,
-      guestsCount: attendanceVal === 'accept' ? guestsCountVal : 0,
-      message: messageVal.trim(),
-      submittedAt: new Date().toISOString(),
-      source: "Harsh & Monika Wedding Website"
-    };
-
-    try {
-      if (CONFIG.googleSheetsRsvpUrl && CONFIG.googleSheetsRsvpUrl.trim() !== "") {
-        // Send to live Google Apps Script Web App
-        await fetch(CONFIG.googleSheetsRsvpUrl.trim(), {
-          method: "POST",
-          mode: "no-cors", // Google Apps Script requires no-cors redirect handling
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-      }
-
-      // Always save client-side record in localStorage as backup
-      const existing = JSON.parse(localStorage.getItem('harsh_monika_rsvps') || '[]');
-      existing.push(payload);
-      localStorage.setItem('harsh_monika_rsvps', JSON.stringify(existing));
-
-      // Mark user device as submitted
-      localStorage.setItem('harsh_monika_rsvp_submitted', JSON.stringify(payload));
-
-      // Auspicious sound chime
-      SoundController.playSoftBell(576, 4.0);
-
-      // Lotus petal burst on canvas
-      AmbientCanvasController.burstPetals();
-
-      // Show success confirmation screen
-      this.showSuccess(payload);
-
-    } catch (err) {
-      console.error("RSVP Submission Error:", err);
-      this.showMessage("Could not transmit your RSVP. Please check connection or message the family directly.", "error");
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span>Confirm RSVP &bull; उपस्थिति पुष्टि करें</span>`;
-      }
-    }
-  },
-
-  showSuccess(data) {
-    const form = document.getElementById('rsvpForm');
-    const successBox = document.getElementById('rsvpSuccessBox');
-    const guestNameDisplay = document.getElementById('successGuestName');
-    const statusNote = document.getElementById('successStatusNote');
-    const editBtn = document.getElementById('btnEditRsvp');
-
-    if (form) form.style.display = 'none';
-    if (successBox) successBox.style.display = 'block';
-    if (editBtn) editBtn.style.display = 'inline-block';
-
-    if (guestNameDisplay) {
-      guestNameDisplay.textContent = data.guestName;
-    }
-
-    if (statusNote) {
-      if (data.attendance === 'accept') {
-        statusNote.textContent = `Sadhu Sadhu! We eagerly await welcoming you and your party of ${data.guestsCount} to celebrate our wedding.`;
-      } else {
-        statusNote.textContent = `We receive your blessings and loving-kindness with heartfelt gratitude.`;
-      }
-    }
-
-    // Auto-reset back to the RSVP form after 30 seconds
-    if (this.resetTimer) clearTimeout(this.resetTimer);
-    if (this.countdownInterval) clearInterval(this.countdownInterval);
-
-    let remainingSeconds = 30;
-    if (editBtn) {
-      editBtn.innerHTML = `Update Response / पुन: संशोधन करें (${remainingSeconds}s)`;
-    }
-
-    this.countdownInterval = setInterval(() => {
-      remainingSeconds--;
-      if (remainingSeconds > 0) {
-        if (editBtn) {
-          editBtn.innerHTML = `Update Response / पुन: संशोधन करें (${remainingSeconds}s)`;
+    // Copy Phone Number
+    if (btnCopy) {
+      btnCopy.addEventListener('click', () => {
+        const num = (CONFIG.whatsAppContactNumber || "").replace(/[^0-9]/g, '');
+        const textToCopy = num ? `+${num}` : "";
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy)
+            .then(() => this.showToast("WhatsApp number copied to clipboard!"))
+            .catch(() => this.fallbackCopy(textToCopy));
+        } else {
+          this.fallbackCopy(textToCopy);
         }
-      } else {
-        clearInterval(this.countdownInterval);
-        this.countdownInterval = null;
-      }
-    }, 1000);
-
-    this.resetTimer = setTimeout(() => {
-      this.resetForm();
-    }, 30000);
-  },
-
-  showAlreadySubmitted() {
-    const raw = localStorage.getItem('harsh_monika_rsvp_submitted');
-    if (!raw) return;
-    try {
-      const data = JSON.parse(raw);
-      this.showSuccess(data);
-    } catch (e) {
-      console.warn("Error parsing previously submitted RSVP:", e);
+      });
     }
   },
 
-  showMessage(msg, type = "error") {
-    const statusMsg = document.getElementById('rsvpStatusMessage');
-    if (!statusMsg) return;
-    statusMsg.textContent = msg;
-    statusMsg.className = `rsvp-status-message ${type}`;
-    statusMsg.style.display = 'block';
+  showToast(msg) {
+    const toast = document.getElementById('toastNotice');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 3200);
+  },
+
+  fallbackCopy(text) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    try {
+      document.execCommand('copy');
+      this.showToast("WhatsApp number copied to clipboard!");
+    } catch (e) {
+      console.warn("Copy fallback failed:", e);
+    }
+    document.body.removeChild(el);
   }
 };
 
 /* ==========================================================================
-   8. WHATSAPP & QR CODE SHARING
+   8. SACRED INVITATION CARD DOWNLOAD CONTROLLER (PDF & HIGH-RES IMAGE)
+   Exports dedicated Buddhist invitation card using html2pdf.js & html2canvas.
+   ========================================================================== */
+const DownloadInvitationController = {
+  isGeneratingPdf: false,
+  isGeneratingImage: false,
+
+  init() {
+    const btnPdf = document.getElementById('btnDownloadPdf');
+    const btnImage = document.getElementById('btnDownloadImage');
+
+    if (btnPdf) {
+      btnPdf.addEventListener('click', () => this.downloadAsPdf());
+    }
+
+    if (btnImage) {
+      btnImage.addEventListener('click', () => this.downloadAsImage());
+    }
+  },
+
+  async renderCardCanvas() {
+    const card = document.getElementById('printableInvitationCard');
+    if (!card) throw new Error("Invitation card element not found");
+    if (typeof html2canvas === 'undefined') throw new Error("html2canvas library is not loaded");
+
+    // Ensure all web fonts (Google Fonts & Devanagari) are fully loaded before capturing
+    if (document.fonts && document.fonts.ready) {
+      try {
+        await document.fonts.ready;
+      } catch (fontErr) {
+        console.warn("Font loading wait warning:", fontErr);
+      }
+    }
+
+    // Normalizing scrollY and scrollX to 0 prevents blank canvas when scrolled down
+    const canvas = await html2canvas(card, {
+      scale: 2.2, // ~1050px - 1200px width for crisp vector-like output
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#0A2252',
+      scrollY: 0,
+      scrollX: 0,
+      windowWidth: document.documentElement.offsetWidth,
+      windowHeight: document.documentElement.offsetHeight,
+      onclone: (clonedDoc) => {
+        const clonedCard = clonedDoc.getElementById('printableInvitationCard');
+        if (clonedCard) {
+          clonedCard.style.transform = 'none';
+          clonedCard.style.margin = '0 auto';
+          clonedCard.style.maxWidth = '480px';
+          clonedCard.style.boxShadow = 'none';
+        }
+      }
+    });
+
+    if (!canvas || canvas.width === 0 || canvas.height === 0) {
+      throw new Error("Canvas render returned empty image dimensions");
+    }
+
+    return canvas;
+  },
+
+  async downloadAsPdf() {
+    if (this.isGeneratingPdf) return;
+
+    const btnPdf = document.getElementById('btnDownloadPdf');
+    this.isGeneratingPdf = true;
+
+    if (btnPdf) {
+      btnPdf.disabled = true;
+      btnPdf.innerHTML = `<span class="btn-spinner">⏳</span><span>Rendering PDF Invitation...</span>`;
+    }
+    this.showNotice("Preparing high-resolution PDF wedding card...", "info");
+
+    try {
+      // Step 1: Render card to a pristine canvas from the live rendered DOM
+      const canvas = await this.renderCardCanvas();
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      // Step 2: Access jsPDF engine
+      const jsPDFConstructor = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : (window.jsPDF || null);
+
+      if (jsPDFConstructor) {
+        const pdf = new jsPDFConstructor({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();   // 210 mm
+        const pageHeight = pdf.internal.pageSize.getHeight(); // 297 mm
+
+        // Fill background with royal navy (#06132D) so there is never a blank white page
+        pdf.setFillColor(6, 19, 45);
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+
+        // Calculate aspect-ratio preserved dimensions
+        const margin = 12; // 12mm margins
+        const maxW = pageWidth - (margin * 2);
+        const maxH = pageHeight - (margin * 2);
+
+        const canvasRatio = canvas.width / canvas.height;
+        let cardW = maxW;
+        let cardH = cardW / canvasRatio;
+
+        if (cardH > maxH) {
+          cardH = maxH;
+          cardW = cardH * canvasRatio;
+        }
+
+        const posX = (pageWidth - cardW) / 2;
+        const posY = (pageHeight - cardH) / 2;
+
+        pdf.addImage(imgData, 'JPEG', posX, posY, cardW, cardH, undefined, 'FAST');
+        pdf.save('Harsh-and-Monika-Wedding-Invitation.pdf');
+      } else if (typeof html2pdf !== 'undefined') {
+        const card = document.getElementById('printableInvitationCard');
+        const opt = {
+          margin: 10,
+          filename: 'Harsh-and-Monika-Wedding-Invitation.pdf',
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, backgroundColor: '#0A2252' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        await html2pdf().set(opt).from(card).save();
+      } else {
+        throw new Error("No PDF rendering engine available on window");
+      }
+
+      SoundController.playSoftBell(528, 3.5);
+      AmbientCanvasController.burstPetals();
+      this.showNotice("Wedding invitation PDF downloaded successfully! 🌸", "success");
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      this.showNotice("Could not generate PDF. Please try saving as Image.", "error");
+    } finally {
+      this.isGeneratingPdf = false;
+      if (btnPdf) {
+        btnPdf.disabled = false;
+        btnPdf.innerHTML = `<span class="btn-icon">📄</span><span class="btn-label">Download Invitation as PDF</span>`;
+      }
+    }
+  },
+
+  async downloadAsImage() {
+    if (this.isGeneratingImage) return;
+
+    const btnImage = document.getElementById('btnDownloadImage');
+    this.isGeneratingImage = true;
+
+    if (btnImage) {
+      btnImage.disabled = true;
+      btnImage.innerHTML = `<span class="btn-spinner">⏳</span><span>Rendering High-Res Image...</span>`;
+    }
+    this.showNotice("Generating crystal-clear 1080p+ invitation image...", "info");
+
+    try {
+      const canvas = await this.renderCardCanvas();
+      const imageUri = canvas.toDataURL('image/png');
+
+      const downloadLink = document.createElement('a');
+      downloadLink.download = 'Harsh-and-Monika-Wedding-Invitation.png';
+      downloadLink.href = imageUri;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+      SoundController.playSoftBell(528, 3.5);
+      AmbientCanvasController.burstPetals();
+      this.showNotice("High-resolution wedding invitation image downloaded! 🌸", "success");
+    } catch (err) {
+      console.error("Image generation failed:", err);
+      this.showNotice("Could not generate image. Please try again.", "error");
+    } finally {
+      this.isGeneratingImage = false;
+      if (btnImage) {
+        btnImage.disabled = false;
+        btnImage.innerHTML = `<span class="btn-icon">🖼️</span><span class="btn-label">Download Invitation as Image</span>`;
+      }
+    }
+  },
+
+  showNotice(msg, type = "info") {
+    const noticeEl = document.getElementById('downloadStatusNotice');
+    if (!noticeEl) return;
+    noticeEl.textContent = msg;
+    noticeEl.className = `download-status-notice ${type}`;
+    noticeEl.style.display = 'block';
+
+    setTimeout(() => {
+      if (noticeEl.textContent === msg) {
+        noticeEl.style.display = 'none';
+      }
+    }, 4500);
+  }
+};
+
+/* ==========================================================================
+   9. INVISIBLE CINEMATIC AUTO-SCROLL CONTROLLER
+   100% autonomous, zero buttons or floating controls.
+   Pauses immediately when the user clicks, touches, or scrolls anywhere.
+   Resumes automatically after 5 seconds of user inactivity.
+   Respects prefers-reduced-motion.
+   ========================================================================== */
+const AutoScrollController = {
+  isPlaying: false,
+  isPaused: false,
+  isAtBottom: false,
+  speed: 38, // Pixels per second (gentle, majestic slow-reading pace)
+  animId: null,
+  lastTime: null,
+  subpixelRemainder: 0,
+  reducedMotion: false,
+  inactivityTimer: null,
+  inactivityDelay: 5000, // Exactly 5 seconds of stillness before auto-resuming
+
+  init() {
+    // Check accessibility: prefers-reduced-motion
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this.reducedMotion) {
+      return; // Respect accessibility - no auto-scroll when reduced motion is preferred
+    }
+
+    // Attach user interaction listeners: pause on click, touch, scroll, or keypress
+    this.setupInteractivityListeners();
+
+    // Start scrolling automatically only after the page is fully loaded
+    window.addEventListener('load', () => {
+      const openingScreen = document.getElementById('openingScreen');
+      const isOpeningScreenVisible = openingScreen && !openingScreen.classList.contains('dismissed');
+      
+      // If no opening screen or already dismissed, auto-start after gentle delay
+      if (!isOpeningScreenVisible && !this.reducedMotion && !this.isPlaying) {
+        setTimeout(() => {
+          if (!this.isPlaying) {
+            this.start();
+          }
+        }, 1500);
+      }
+    });
+  },
+
+  setupInteractivityListeners() {
+    // Click or tap anywhere on the page pauses auto-scroll immediately
+    window.addEventListener('click', (e) => this.handleUserInterrupt(e), { passive: true });
+
+    // Touch events (mobile touch tap or drag)
+    window.addEventListener('touchstart', (e) => this.handleUserInterrupt(e), { passive: true });
+    window.addEventListener('touchmove', (e) => this.handleUserInterrupt(e), { passive: true });
+
+    // Mouse / trackpad wheel scroll
+    window.addEventListener('wheel', (e) => this.handleUserInterrupt(e), { passive: true });
+
+    // Keyboard navigation keys
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
+        return;
+      }
+      const navKeys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space', 'Home', 'End'];
+      if (navKeys.includes(e.code) || navKeys.includes(e.key)) {
+        this.handleUserInterrupt(e);
+      }
+    }, { passive: true });
+  },
+
+  handleUserInterrupt(e) {
+    // Ignore clicks or interactions on the welcome screen
+    if (e && e.target && e.target.closest && e.target.closest('#openingScreen')) {
+      return;
+    }
+
+    // Pause immediately on user click, touch, or manual scroll
+    if (this.isPlaying && !this.isPaused) {
+      this.pause();
+    }
+
+    // Schedule automatic resume after exactly 5 seconds of inactivity
+    if (this.isPlaying && !this.isAtBottom) {
+      clearTimeout(this.inactivityTimer);
+      this.inactivityTimer = setTimeout(() => {
+        if (this.isPlaying && this.isPaused && !this.isAtBottom) {
+          this.resume();
+        }
+      }, this.inactivityDelay);
+    }
+  },
+
+  start() {
+    clearTimeout(this.inactivityTimer);
+
+    // If at bottom, restart from top
+    if (this.checkBottom()) {
+      this.restartFromTop();
+      return;
+    }
+
+    this.isPlaying = true;
+    this.isPaused = false;
+    this.isAtBottom = false;
+    this.subpixelRemainder = 0;
+    this.lastTime = performance.now();
+    // Disable CSS smooth scrolling so high-frequency rAF micro-steps glide without interpolation lag
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    cancelAnimationFrame(this.animId);
+    this.animId = requestAnimationFrame((ts) => this.tick(ts));
+  },
+
+  pause() {
+    if (!this.isPlaying) return;
+    this.isPaused = true;
+    cancelAnimationFrame(this.animId);
+    this.animId = null;
+    document.documentElement.style.scrollBehavior = '';
+  },
+
+  resume() {
+    clearTimeout(this.inactivityTimer);
+
+    if (!this.isPlaying) {
+      this.start();
+      return;
+    }
+
+    if (this.checkBottom()) {
+      this.restartFromTop();
+      return;
+    }
+
+    this.isPaused = false;
+    this.subpixelRemainder = 0;
+    this.lastTime = performance.now();
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    cancelAnimationFrame(this.animId);
+    this.animId = requestAnimationFrame((ts) => this.tick(ts));
+  },
+
+  stop(finished = false) {
+    clearTimeout(this.inactivityTimer);
+    this.isPlaying = false;
+    this.isPaused = false;
+    cancelAnimationFrame(this.animId);
+    this.animId = null;
+    document.documentElement.style.scrollBehavior = '';
+
+    if (finished) {
+      this.isAtBottom = true;
+      // After reaching the bottom, wait 5 seconds then gently rewind to top and restart
+      setTimeout(() => {
+        if (this.isAtBottom) {
+          this.restartFromTop();
+        }
+      }, 5000);
+    }
+  },
+
+  tick(timestamp) {
+    if (!this.isPlaying || this.isPaused) return;
+
+    if (!this.lastTime) this.lastTime = timestamp;
+    const delta = Math.min((timestamp - this.lastTime) / 1000, 0.05);
+    this.lastTime = timestamp;
+
+    this.subpixelRemainder = (this.subpixelRemainder || 0) + (this.speed * delta);
+    if (this.subpixelRemainder >= 1) {
+      const step = Math.floor(this.subpixelRemainder);
+      this.subpixelRemainder -= step;
+      window.scrollBy(0, step);
+    }
+
+    if (this.checkBottom()) {
+      this.stop(true);
+      return;
+    }
+
+    this.animId = requestAnimationFrame((ts) => this.tick(ts));
+  },
+
+  checkBottom() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const maxScroll = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight
+    ) - window.innerHeight;
+    return scrollY >= maxScroll - 4;
+  },
+
+  restartFromTop() {
+    // Cancel any existing animation frame (isPlaying may be false here)
+    cancelAnimationFrame(this.animId);
+    this.animId = null;
+    this.isPaused = false;
+    document.documentElement.style.scrollBehavior = '';
+    this.smoothScrollTo(0, () => {
+      setTimeout(() => {
+        this.isAtBottom = false;
+        this.start();
+      }, 1000);
+    });
+  },
+
+  smoothScrollTo(targetY, callback) {
+    document.documentElement.style.scrollBehavior = '';
+    if (typeof gsap !== 'undefined' && typeof ScrollToPlugin !== 'undefined') {
+      gsap.to(window, {
+        duration: 1.5,
+        scrollTo: { y: targetY, autoKill: false },
+        ease: "power2.inOut",
+        onComplete: () => {
+          if (callback) callback();
+        }
+      });
+    } else {
+      window.scrollTo({ top: targetY, behavior: 'smooth' });
+      if (callback) setTimeout(callback, 800);
+    }
+  }
+};
+
+/* ==========================================================================
+   10. WHATSAPP & QR CODE SHARING
    ========================================================================== */
 const ShareController = {
   qrCodeInstance: null,
@@ -924,7 +1205,7 @@ const ShareController = {
       `⏰ *Time:* 7:00 PM IST\n` +
       `🏛️ *Venue:* THE ROYAL AVENUE\n` +
       `📍 *Address:* Beside Vijay Farms, Bhadesi Mafi, Aligarh, Uttar Pradesh 202002\n\n` +
-      `🌸 *View our digital invitation & confirm RSVP:* \n${url}\n\n` +
+      `🌸 *View our digital wedding invitation:* \n${url}\n\n` +
       `॥ सब्वे सत्ता सुखी होन्तु ॥`;
 
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
@@ -1043,7 +1324,7 @@ const ShareController = {
 };
 
 /* ==========================================================================
-   9. ADD TO CALENDAR CONTROLLER
+   11. ADD TO CALENDAR CONTROLLER
    Google Calendar Link & iCal (.ics) Generator
    ========================================================================== */
 const CalendarController = {
@@ -1112,7 +1393,57 @@ const CalendarController = {
 };
 
 /* ==========================================================================
-   10. AMBIENT CANVAS (Lotus Petals & Golden Light Dust)
+   12. CREATOR DETAILS & CREDITS CONTROLLER
+   Renders configurable developer credit and optional social links in the footer.
+   ========================================================================== */
+const CreatorController = {
+  init() {
+    const config = CONFIG.creator;
+    if (!config) return;
+
+    const roleEl = document.getElementById('creatorRole');
+    const nameEl = document.getElementById('creatorName');
+    const linksContainer = document.getElementById('creatorSocialLinks');
+
+    if (roleEl && config.role) {
+      roleEl.textContent = config.role;
+    }
+
+    if (nameEl && config.name) {
+      nameEl.textContent = config.name;
+    }
+
+    if (linksContainer) {
+      linksContainer.innerHTML = '';
+
+      const socialMap = [
+        { key: 'github', label: 'GitHub', icon: '💻' },
+        { key: 'portfolio', label: 'Portfolio', icon: '🌐' },
+        { key: 'instagram', label: 'Instagram', icon: '📸' }
+      ];
+
+      socialMap.forEach(item => {
+        const url = config[item.key];
+        if (url && typeof url === 'string' && url.trim() !== '') {
+          const a = document.createElement('a');
+          a.href = url.trim();
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'creator-link';
+          a.innerHTML = `<span>${item.icon}</span><span>${item.label}</span>`;
+          linksContainer.appendChild(a);
+        }
+      });
+
+      if (!linksContainer.children.length) {
+        linksContainer.style.display = 'none';
+      }
+    }
+  }
+};
+
+/* ==========================================================================
+   13. AMBIENT CANVAS (Lotus Petals & Golden Light Dust)
    ========================================================================== */
 const AmbientCanvasController = {
   canvas: null,
@@ -1257,7 +1588,7 @@ const AmbientCanvasController = {
 };
 
 /* ==========================================================================
-   11. NAVIGATION & SCROLLSPY CONTROLLER
+   14. NAVIGATION & SCROLLSPY CONTROLLER
    ========================================================================== */
 const NavigationController = {
   init() {
@@ -1332,7 +1663,7 @@ const NavigationController = {
   },
 
   updateScrollSpy() {
-    const sections = ['hero', 'invitationCard', 'blessings', 'countdown', 'events', 'venue', 'rsvp', 'share'];
+    const sections = ['hero', 'invitationCard', 'blessings', 'countdown', 'events', 'venue', 'contact', 'download', 'share'];
     const scrollPos = window.scrollY + 160;
 
     for (let i = sections.length - 1; i >= 0; i--) {
@@ -1352,7 +1683,7 @@ const NavigationController = {
 };
 
 /* ==========================================================================
-   12. THREE.JS 3D HERO SCENE (3D Ashoka Chakra, Starfield & Royal Lighting)
+   15. THREE.JS 3D HERO SCENE (3D Ashoka Chakra, Starfield & Royal Lighting)
    Optimized with IntersectionObserver to pause rendering when offscreen.
    ========================================================================== */
 const HeroThreeSceneController = {
@@ -1689,7 +2020,7 @@ const HeroThreeSceneController = {
 };
 
 /* ==========================================================================
-   13. THREE.JS 3D INTERTWINED WEDDING RINGS SCENE
+   16. THREE.JS 3D INTERTWINED WEDDING RINGS SCENE
    Features realistic PBR gold bands with continuous specular gleam.
    ========================================================================== */
 const RingsThreeSceneController = {
@@ -1881,7 +2212,7 @@ const RingsThreeSceneController = {
 };
 
 /* ==========================================================================
-   14. GSAP & SCROLLTRIGGER ANIMATION CONTROLLER
+   17. GSAP & SCROLLTRIGGER ANIMATION CONTROLLER
    Delivers smooth cinematic reveals and section transitions.
    Respects user's prefers-reduced-motion settings.
    ========================================================================== */
@@ -1896,6 +2227,9 @@ const GSAPAnimationController = {
 
     if (typeof ScrollTrigger !== 'undefined') {
       gsap.registerPlugin(ScrollTrigger);
+    }
+    if (typeof ScrollToPlugin !== 'undefined') {
+      gsap.registerPlugin(ScrollToPlugin);
     }
 
     this.animateHeroEntrance();

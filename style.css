@@ -41,7 +41,7 @@
   /* Typography */
   --font-serif-title: 'Cinzel', serif;
   --font-serif-body: 'Cormorant Garamond', Georgia, serif;
-  --font-devanagari: 'Rozha One', 'Cinzel', serif;
+  --font-devanagari: 'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Rozha One', serif;
   --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Radii & Transitions */
@@ -78,8 +78,6 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   position: relative;
-  selection-background-color: var(--gold-primary);
-  selection-color: var(--royal-blue-deep);
 }
 
 ::selection {
@@ -279,7 +277,7 @@ section[id] {
 #openingScreen {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 1000;
   background: radial-gradient(circle at center, #0E2C68 0%, #081D45 45%, #051026 100%);
   display: flex;
   align-items: center;
@@ -1222,139 +1220,449 @@ section[id] {
   filter: contrast(1.05) saturate(1.1);
 }
 
-/* --- 13. RSVP FORM SECTION --- */
-.rsvp-section {
+/* --- 13. WHATSAPP ENQUIRIES & BLESSINGS SECTION --- */
+.contact-section {
   padding: 6rem 1.5rem;
   position: relative;
   z-index: 10;
 }
 
-.rsvp-card-wrapper {
+.whatsapp-card {
   max-width: 680px;
   margin: 0 auto;
   background: var(--bg-card);
   border: 1.5px solid var(--border-gold);
   border-radius: var(--radius-lg);
-  padding: 3rem 2.25rem;
+  padding: 3.25rem 2.5rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
   position: relative;
+  text-align: center;
 }
 
-.rsvp-form {
+.whatsapp-card-content {
   display: flex;
   flex-direction: column;
-  gap: 1.35rem;
+  align-items: center;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  text-align: left;
-}
-
-.form-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--gold-light);
-}
-
-.form-label .required {
-  color: #EF4444;
-}
-
-.form-input, .form-select, .form-textarea {
-  width: 100%;
-  background: rgba(6, 19, 45, 0.85);
-  border: 1px solid var(--border-gold-subtle);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.15rem;
-  font-size: 0.92rem;
-  color: #FFFFFF;
-  font-family: inherit;
-  transition: all var(--transition-fast);
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  outline: none;
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
-  background: rgba(8, 29, 69, 0.95);
-}
-
-.form-input::placeholder, .form-textarea::placeholder {
-  color: var(--text-dim);
-}
-
-/* Radio attendance options */
-.attendance-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.radio-card {
-  border: 1.5px solid var(--border-gold-subtle);
-  background: rgba(6, 19, 45, 0.7);
-  border-radius: var(--radius-md);
-  padding: 1rem;
+.whatsapp-icon-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 211, 102, 0.25) 0%, rgba(11, 37, 89, 0.8) 70%);
+  border: 2px solid #25D366;
+  box-shadow: 0 0 25px rgba(37, 211, 102, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+  color: #25D366;
+  transition: transform var(--transition-normal);
+}
+
+.whatsapp-card:hover .whatsapp-icon-circle {
+  transform: scale(1.08) rotate(4deg);
+}
+
+.whatsapp-card-title {
+  font-family: var(--font-serif-title);
+  font-size: 1.6rem;
+  color: var(--gold-bright);
+  margin-bottom: 0.75rem;
+}
+
+.whatsapp-card-desc {
+  font-family: var(--font-serif-body);
+  font-size: 1.05rem;
+  color: var(--white-cream);
+  line-height: 1.7;
+  max-width: 540px;
+  margin-bottom: 1.75rem;
+}
+
+.whatsapp-phone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(6, 19, 45, 0.8);
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: 30px;
+  padding: 0.5rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.phone-icon {
+  font-size: 1rem;
+}
+
+.phone-number {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  color: var(--gold-light);
+}
+
+.btn-copy-chip {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  color: var(--gold-bright);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
   cursor: pointer;
   transition: all var(--transition-fast);
-  user-select: none;
 }
 
-.radio-card:hover {
-  border-color: var(--gold-primary);
-  background: rgba(11, 37, 89, 0.8);
+.btn-copy-chip:hover {
+  background: var(--gold-primary);
+  color: #06132D;
 }
 
-.radio-card.selected {
-  border-color: var(--gold-bright);
-  background: rgba(212, 175, 55, 0.18);
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.3);
+.whatsapp-action-wrapper {
+  width: 100%;
+  max-width: 440px;
 }
 
-.radio-card input {
-  display: none;
-}
-
-.rsvp-status-message {
-  padding: 1rem;
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #FFFFFF !important;
+  font-weight: 600;
+  padding: 0.95rem 1.75rem;
   border-radius: var(--radius-md);
-  font-size: 0.88rem;
-  text-align: center;
-  display: none;
+  border: 1.5px solid #25D366;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  text-decoration: none;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  transition: all var(--transition-normal);
+  cursor: pointer;
 }
 
-.rsvp-status-message.success {
-  display: block;
+.btn-whatsapp:hover {
+  background: linear-gradient(135deg, #2EE070 0%, #17A191 100%);
+  box-shadow: 0 6px 28px rgba(37, 211, 102, 0.6);
+  transform: translateY(-2px);
+  color: #FFFFFF !important;
+}
+
+.btn-whatsapp-icon {
+  font-size: 1.25rem;
+}
+
+.whatsapp-footnote {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 1.25rem;
+}
+
+/* --- 14. DOWNLOAD WEDDING INVITATION SECTION (PDF & IMAGE) --- */
+.download-section {
+  padding: 6rem 1.5rem;
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(6, 19, 45, 0) 0%, rgba(8, 26, 64, 0.5) 50%, rgba(6, 19, 45, 0) 100%);
+}
+
+.download-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.card-preview-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-preview-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* THE DEDICATED PRINTABLE & EXPORTABLE INVITATION CARD */
+.printable-invitation-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: #0A2252;
+  background-image: linear-gradient(145deg, #0A2252 0%, #0B2559 50%, #061533 100%);
+  border: 2px solid #D4AF37;
+  border-radius: var(--radius-md, 12px);
+  padding: 2.5rem 1.85rem;
+  position: relative;
+  box-shadow: inset 0 0 0 6px #081B40, inset 0 0 0 7px rgba(212, 175, 55, 0.5), 0 25px 60px rgba(0, 0, 0, 0.85);
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.card-corner {
+  position: absolute;
+  font-size: 1.1rem;
+  color: var(--gold-primary);
+  line-height: 1;
+}
+
+.corner-top-left { top: 12px; left: 14px; }
+.corner-top-right { top: 12px; right: 14px; }
+.corner-bottom-left { bottom: 12px; left: 14px; }
+.corner-bottom-right { bottom: 12px; right: 14px; }
+
+.print-card-header {
+  margin-bottom: 1.25rem;
+}
+
+.print-sacred-chant {
+  font-family: var(--font-devanagari);
+  font-size: 0.92rem;
+  color: var(--gold-bright);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.print-namo-buddhaya {
+  font-family: var(--font-devanagari);
+  font-size: 1.15rem;
+  color: var(--gold-light);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.print-chakra-container {
+  display: flex;
+  justify-content: center;
+  margin: 0.65rem 0;
+}
+
+.print-chakra-svg {
+  width: 58px;
+  height: 58px;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.print-blessing-sub {
+  font-family: var(--font-serif-title);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-top: 0.5rem;
+}
+
+.print-devanagari-lead {
+  font-family: var(--font-devanagari);
+  font-size: 0.85rem;
+  color: var(--white-cream);
+  margin-top: 0.25rem;
+}
+
+.print-couple-section {
+  padding: 1rem 0;
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  margin: 1.25rem 0;
+}
+
+.print-groom-name, .print-bride-name {
+  font-family: var(--font-serif-title);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.print-hindi-name {
+  font-family: var(--font-devanagari);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gold-light);
+}
+
+.print-conjunction {
+  font-family: var(--font-serif-body);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--gold-primary);
+  margin: 0.15rem 0;
+}
+
+.print-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+  background: rgba(6, 19, 45, 0.6);
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.print-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.print-detail-icon {
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.print-detail-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.print-detail-text strong {
+  color: var(--gold-bright);
+  font-size: 0.82rem;
+}
+
+.print-detail-text span {
+  color: var(--text-dim);
+}
+
+.print-card-footer {
+  margin-top: 0.75rem;
+}
+
+.print-footer-chant {
+  font-family: var(--font-devanagari);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  margin-bottom: 0.25rem;
+}
+
+.print-footer-trans {
+  font-family: var(--font-serif-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--white-cream);
+  margin-bottom: 0.5rem;
+}
+
+.print-inviting-by {
+  font-size: 0.72rem;
+  color: var(--gold-light);
+}
+
+/* Download Actions Side Panel */
+.download-actions-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.download-action-card {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: 1.75rem 1.5rem;
+  transition: all var(--transition-normal);
+}
+
+.download-action-card:hover {
+  border-color: var(--gold-bright);
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+  transform: translateY(-2px);
+}
+
+.action-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1.5px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.action-details {
+  flex: 1;
+}
+
+.action-card-title {
+  font-family: var(--font-serif-title);
+  font-size: 1.15rem;
+  color: var(--gold-bright);
+  margin-bottom: 0.4rem;
+}
+
+.action-card-desc {
+  font-size: 0.85rem;
+  color: var(--white-cream);
+  line-height: 1.5;
+  margin-bottom: 1.15rem;
+}
+
+.btn-download-action {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.84rem;
+}
+
+.btn-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.download-status-notice {
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.download-status-notice.info {
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid #3B82F6;
+  color: #BFDBFE;
+}
+
+.download-status-notice.success {
   background: rgba(16, 185, 129, 0.2);
   border: 1px solid #10B981;
   color: #D1FAE5;
 }
 
-.rsvp-status-message.error {
-  display: block;
+.download-status-notice.warning, .download-status-notice.error {
   background: rgba(239, 68, 68, 0.2);
   border: 1px solid #EF4444;
   color: #FEE2E2;
-}
-
-.demo-mode-note {
-  font-size: 0.75rem;
-  color: var(--gold-light);
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px dashed var(--border-gold);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.85rem;
-  margin-top: 0.5rem;
-  text-align: center;
 }
 
 /* --- 14. SHARE & QR CODE SECTION --- */
@@ -1442,7 +1750,7 @@ section[id] {
 .site-footer {
   background: #040C1D;
   border-top: 1px solid var(--border-gold-subtle);
-  padding: 4.5rem 1.5rem 2.5rem;
+  padding: 4.5rem 1.5rem 6.5rem;
   text-align: center;
   position: relative;
   z-index: 10;
@@ -1496,6 +1804,60 @@ section[id] {
   padding-top: 1.75rem;
   font-size: 0.78rem;
   color: var(--text-dim);
+}
+
+/* --- Creator Credit Footer Section --- */
+.creator-credit-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  animation: fadeIn 1.2s ease;
+}
+
+.creator-text {
+  font-size: 0.85rem;
+  color: var(--white-cream);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.creator-name {
+  color: var(--gold-bright);
+  font-family: var(--font-serif-title);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.creator-social-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 0.65rem;
+}
+
+.creator-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(11, 37, 89, 0.7);
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: 20px;
+  color: var(--gold-light);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 0.35rem 0.85rem;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.creator-link:hover {
+  background: var(--gold-primary);
+  border-color: var(--gold-bright);
+  color: #06132D !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
 }
 
 /* --- 16. FULL RESPONSIVE DESIGN SYSTEM (320px to 4K Ultra-Wide) --- */
@@ -1558,13 +1920,17 @@ section[id] {
     padding: 2.75rem 1.5rem;
   }
 
-  .rsvp-card-wrapper {
+  .whatsapp-card {
     padding: 2.25rem 1.5rem;
   }
 
-  .attendance-options {
+  .download-container {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 2rem;
+  }
+
+  .printable-invitation-card {
+    padding: 2rem 1.25rem;
   }
 
   .btn {
@@ -1576,11 +1942,6 @@ section[id] {
     flex-direction: column;
     width: 100%;
     gap: 0.75rem;
-  }
-
-  /* Prevent iOS Safari from automatically zooming on form inputs */
-  .form-input, .form-select, .form-textarea {
-    font-size: 16px !important;
   }
 }
 
@@ -1720,7 +2081,7 @@ section[id] {
     max-width: 260px;
   }
 
-  .rsvp-card-wrapper {
+  .whatsapp-card {
     padding: 1.75rem 0.85rem;
   }
 
@@ -1788,7 +2149,7 @@ section[id] {
     font-size: 3.25rem;
   }
 
-  .events-container, .countdown-box, .rsvp-card-wrapper, .share-card {
+  .events-container, .countdown-box, .whatsapp-card, .download-container, .share-card {
     max-width: 900px;
   }
 }

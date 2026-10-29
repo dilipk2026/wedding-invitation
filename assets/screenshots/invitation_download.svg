@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06132D" />
+      <stop offset="100%" stop-color="#0B2559" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bgGrad2)" />
+  <rect x="20" y="20" width="1160" height="710" fill="none" stroke="#D4AF37" stroke-width="3" />
+  <rect x="30" y="30" width="1140" height="690" fill="none" stroke="#334155" stroke-width="1" />
+  
+  <text x="60" y="70" font-family="Georgia, serif" font-size="20" fill="#D4AF37" font-style="italic">HARSH &amp; MONIKA • SACRED BUDDHIST WEDDING</text>
+  <rect x="60" y="95" width="340" height="34" rx="17" fill="rgba(212, 175, 55, 0.2)" stroke="#D4AF37" stroke-width="1.5" />
+  <text x="75" y="118" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#F3E5AB">KEEPSAKE INVITATION EXPORT</text>
+  
+  <text x="60" y="175" font-family="Georgia, serif" font-size="34" font-weight="bold" fill="#FFFFFF">Download Wedding Invitation (PDF &amp; Image)</text>
+  <text x="60" y="215" font-family="'Segoe UI', sans-serif" font-size="18" fill="#60A5FA">Vector-sharp printable A4 PDF &amp; 1080p+ PNG with Devanagari calligraphy</text>
+  
+  <!-- Left: Card Preview -->
+  <rect x="80" y="260" width="460" height="420" rx="14" fill="#0A2252" stroke="#D4AF37" stroke-width="2" />
+  <text x="310" y="305" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="bold" fill="#D4AF37">॥ नमो तस्स भगवतो अरहतो सम्मासम्बुद्धस्स ॥</text>
+  <circle cx="310" cy="345" r="22" fill="#0B2559" stroke="#D4AF37" stroke-width="2" />
+  <text x="310" y="405" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="#F3E5AB">Harsh &amp; Monika</text>
+  <text x="310" y="435" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="18" fill="#D4AF37">हर्ष संग मोनिका</text>
+  <text x="310" y="475" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="14" fill="#FFFFFF">Wednesday, 25 November 2026 • 7:00 PM IST</text>
+  <text x="310" y="505" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="13" fill="#BFDBFE">THE ROYAL AVENUE, Aligarh, Uttar Pradesh</text>
+  <text x="310" y="555" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" fill="#D4AF37">॥ सब्वे सत्ता सुखी होन्तु ॥</text>
+  
+  <!-- Right: Action Cards -->
+  <rect x="580" y="280" width="540" height="170" rx="12" fill="rgba(8, 26, 64, 0.85)" stroke="#D4AF37" stroke-width="1.5" />
+  <text x="610" y="330" font-size="32">📄</text>
+  <text x="660" y="325" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#F3E5AB">Download Invitation as PDF</text>
+  <text x="660" y="355" font-family="'Segoe UI', sans-serif" font-size="14" fill="#E2E8F0">Print-ready vector A4 document with Devanagari Hindi font support.</text>
+  <rect x="660" y="380" width="280" height="42" rx="8" fill="#D4AF37" />
+  <text x="800" y="406" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#06132D">Download PDF</text>
+
+  <rect x="580" y="480" width="540" height="170" rx="12" fill="rgba(8, 26, 64, 0.85)" stroke="#D4AF37" stroke-width="1.5" />
+  <text x="610" y="530" font-size="32">🖼️</text>
+  <text x="660" y="525" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#F3E5AB">Download Invitation as Image</text>
+  <text x="660" y="555" font-family="'Segoe UI', sans-serif" font-size="14" fill="#E2E8F0">High-resolution PNG graphic ideal for WhatsApp Status and story sharing.</text>
+  <rect x="660" y="580" width="280" height="42" rx="8" fill="#1D4ED8" stroke="#D4AF37" stroke-width="1" />
+  <text x="800" y="606" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">Download Image</text>
+</svg>

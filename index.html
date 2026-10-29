@@ -17,16 +17,20 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230B2559' stroke='%23D4AF37' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='40' stroke='%232563EB' stroke-width='2' fill='none'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23D4AF37'/%3E%3Cpath d='M50 10 L50 90 M10 50 L90 50 M21.7 21.7 L78.3 78.3 M21.7 78.3 L78.3 21.7' stroke='%23D4AF37' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="alternate icon" href="favicon.ico" />
 
-  <!-- Google Fonts: Cinzel, Cormorant Garamond, Rozha One (Devanagari), Poppins -->
+  <!-- Google Fonts: Cinzel, Cormorant Garamond, Noto Sans & Serif Devanagari, Rozha One, Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Serif+Devanagari:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&display=swap" rel="stylesheet" />
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
 
   <!-- QR Code Generator Library -->
   <script src="assets/qrcode.min.js"></script>
+
+  <!-- html2canvas & jsPDF for Keepsake Invitation Card Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -140,7 +144,8 @@
         <a href="#countdown" class="nav-link">Countdown</a>
         <a href="#events" class="nav-link">Events</a>
         <a href="#venue" class="nav-link">Venue</a>
-        <a href="#rsvp" class="nav-link">RSVP</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <a href="#download" class="nav-link">Download</a>
         <a href="#share" class="nav-link">Share</a>
       </nav>
 
@@ -196,7 +201,8 @@
         <a href="#countdown" class="drawer-link">Wedding Countdown</a>
         <a href="#events" class="drawer-link">Ceremony Schedule</a>
         <a href="#venue" class="drawer-link">Venue &amp; Maps</a>
-        <a href="#rsvp" class="drawer-link">RSVP Confirmation</a>
+        <a href="#contact" class="drawer-link">WhatsApp Enquiries</a>
+        <a href="#download" class="drawer-link">Download Invitation</a>
         <a href="#share" class="drawer-link">Share Invitation</a>
       </nav>
     </div>
@@ -211,8 +217,8 @@
     </div>
   </div>
 
-  <!-- Optional Local Audio Element (Add src attribute if providing a custom MP3) -->
-  <audio id="bgAudio" loop preload="none"></audio>
+  <!-- Background Music Audio Element -->
+  <audio id="bgAudio" src="assets/chanakya.mp3" loop preload="auto"></audio>
 
   <main>
     <!-- =======================================================================
@@ -265,13 +271,13 @@
             <span>📜</span>
             <span>View Invitation Card</span>
           </a>
-          <a href="#rsvp" class="btn btn-royal">
-            <span>✍️</span>
-            <span>Confirm RSVP</span>
+          <a href="#contact" class="btn btn-royal">
+            <span>💬</span>
+            <span>Contact Us on WhatsApp</span>
           </a>
-          <a href="#events" class="btn btn-outline-gold">
-            <span>⏰</span>
-            <span>Ceremony Schedule</span>
+          <a href="#download" class="btn btn-outline-gold">
+            <span>📥</span>
+            <span>Download Invitation</span>
           </a>
         </div>
       </div>
@@ -705,110 +711,209 @@
     </section>
 
     <!-- =======================================================================
-         SCENE 7: INTERACTIVE RSVP (GOOGLE SHEETS INTEGRATION)
+         SCENE 7: WHATSAPP ENQUIRIES & BLESSINGS
          ======================================================================= -->
-    <section id="rsvp" class="rsvp-section gsap-section">
+    <section id="contact" class="contact-section gsap-section">
       <div class="section-header gsap-reveal">
         <div class="badge-gold">
-          <span>✍️</span>
-          <span>PRESENCE &bull; उपस्थिति पुष्टि</span>
-          <span>✍️</span>
+          <span>💬</span>
+          <span>ENQUIRIES &amp; BLESSINGS &bull; संपर्क एवं शुभकामनाएं</span>
+          <span>💬</span>
         </div>
-        <h2 class="section-title">Celebrate With Us</h2>
-        <p class="section-subtitle">
-          Kindly confirm your presence so we can prepare our sanctuary with love and hospitality.
+        <h2 class="section-title">For Wedding Enquiries &amp; Blessings</h2>
+        <p class="section-subtitle devanagari-subtitle">
+          विवाह संबंधी जानकारी एवं शुभकामनाओं के लिए
         </p>
       </div>
 
-      <div class="rsvp-card-wrapper card-filigree gsap-reveal">
-        <!-- Demo Mode Notice (Shows only if Google Sheets endpoint is not yet connected) -->
-        <div id="rsvpDemoBadge" class="demo-mode-note">
-          ℹ️ <strong>Demo Mode:</strong> RSVPs are currently saved safely in your browser storage. Connect your Google Apps Script URL in <code>script.js</code> to send responses directly to your Google Sheet.
+      <div class="whatsapp-card card-filigree gsap-reveal">
+        <div class="whatsapp-card-content">
+          <div class="whatsapp-icon-circle">
+            <svg class="whatsapp-svg" viewBox="0 0 448 512" width="48" height="48" fill="currentColor">
+              <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+            </svg>
+          </div>
+
+          <h3 class="whatsapp-card-title">Connect Directly with the Families</h3>
+          <p class="whatsapp-card-desc">
+            We are honored by your affection and blessings. For wedding enquiries, venue navigation, or to send warm wishes directly to Harsh &amp; Monika, connect with us on WhatsApp.
+          </p>
+
+          <div class="whatsapp-phone-badge">
+            <span class="phone-icon">📞</span>
+            <span id="whatsappNumberDisplay" class="phone-number">+91 63983 34625</span>
+            <button id="btnCopyWhatsAppNumber" class="btn-copy-chip" title="Copy phone number" aria-label="Copy phone number">
+              <span>📋 Copy</span>
+            </button>
+          </div>
+
+          <div class="whatsapp-action-wrapper">
+            <a id="btnWhatsAppContact" href="https://wa.me/916398334625" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
+              <span class="btn-whatsapp-icon">💬</span>
+              <span>Contact Us on WhatsApp &bull; व्हाट्सएप पर संपर्क करें</span>
+            </a>
+          </div>
+
+          <p class="whatsapp-footnote">
+            ⚡ Opens directly in WhatsApp on mobile or WhatsApp Web on desktop.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SCENE 8: DOWNLOAD WEDDING INVITATION (PDF & HIGH-RES IMAGE)
+         ======================================================================= -->
+    <section id="download" class="download-section gsap-section">
+      <div class="section-header gsap-reveal">
+        <div class="badge-gold">
+          <span>📥</span>
+          <span>SACRED KEEPSAKE &bull; निमंत्रण पत्र</span>
+          <span>📥</span>
+        </div>
+        <h2 class="section-title">Download Wedding Invitation</h2>
+        <p class="section-subtitle devanagari-subtitle">
+          विवाह निमंत्रण डाउनलोड करें — Save or print our sacred wedding invitation card
+        </p>
+      </div>
+
+      <div class="download-container gsap-reveal">
+        <!-- Interactive Preview Frame of the Keepsake Card -->
+        <div class="card-preview-stage">
+          <div class="card-preview-badge">
+            <span>✨ Keepsake Invitation Card Preview ✨</span>
+          </div>
+
+          <!-- THE DEDICATED INVITATION CARD (Target for html2pdf and html2canvas) -->
+          <div id="printableInvitationCard" class="printable-invitation-card">
+            <!-- Corner Filigree Accents -->
+            <div class="card-corner corner-top-left">✧</div>
+            <div class="card-corner corner-top-right">✧</div>
+            <div class="card-corner corner-bottom-left">✧</div>
+            <div class="card-corner corner-bottom-right">✧</div>
+
+            <!-- Buddhist Sacred Chants & Top Emblem -->
+            <div class="print-card-header">
+              <div class="print-sacred-chant">॥ नमो तस्स भगवतो अरहतो सम्मासम्बुद्धस्स ॥</div>
+              <div class="print-namo-buddhaya">॥ नमो बुद्धाय ॥</div>
+              
+              <!-- Ashoka Chakra SVG Emblem -->
+              <div class="print-chakra-container">
+                <svg class="print-chakra-svg" width="58" height="58" viewBox="0 0 100 100" fill="none">
+                  <circle cx="50" cy="50" r="46" stroke="#D4AF37" stroke-width="2.5" />
+                  <circle cx="50" cy="50" r="41" stroke="#2563EB" stroke-width="1.5" />
+                  <circle cx="50" cy="50" r="8" fill="#0B2559" stroke="#D4AF37" stroke-width="2" />
+                  <!-- 24 Spokes -->
+                  <g stroke="#D4AF37" stroke-width="1.4" stroke-linecap="round">
+                    <line x1="50" y1="50" x2="50" y2="9" />
+                    <line x1="50" y1="50" x2="60.7" y2="10.4" />
+                    <line x1="50" y1="50" x2="70.5" y2="14.7" />
+                    <line x1="50" y1="50" x2="78.8" y2="21.5" />
+                    <line x1="50" y1="50" x2="85" y2="30.3" />
+                    <line x1="50" y1="50" x2="88.7" y2="40.5" />
+                    <line x1="50" y1="50" x2="89.8" y2="50" />
+                    <line x1="50" y1="50" x2="88.1" y2="60.5" />
+                    <line x1="50" y1="50" x2="83.8" y2="70.8" />
+                    <line x1="50" y1="50" x2="77" y2="79.3" />
+                    <line x1="50" y1="50" x2="68.1" y2="85.7" />
+                    <line x1="50" y1="50" x2="58" y2="89.3" />
+                    <line x1="50" y1="50" x2="50" y2="91" />
+                    <line x1="50" y1="50" x2="39.3" y2="89.6" />
+                    <line x1="50" y1="50" x2="29.5" y2="85.3" />
+                    <line x1="50" y1="50" x2="21.2" y2="78.5" />
+                    <line x1="50" y1="50" x2="15" y2="69.7" />
+                    <line x1="50" y1="50" x2="11.3" y2="59.5" />
+                    <line x1="50" y1="50" x2="10.2" y2="50" />
+                    <line x1="50" y1="50" x2="11.9" y2="39.5" />
+                    <line x1="50" y1="50" x2="16.2" y2="29.2" />
+                    <line x1="50" y1="50" x2="23" y2="20.7" />
+                    <line x1="50" y1="50" x2="31.9" y2="14.3" />
+                    <line x1="50" y1="50" x2="42" y2="10.7" />
+                  </g>
+                </svg>
+              </div>
+
+              <p class="print-blessing-sub">With the divine blessings of Lord Buddha &amp; Triple Gem</p>
+              <p class="print-devanagari-lead">
+                के पावन परिणय संस्कार में आपकी गरिमामयी उपस्थिति सादर प्रार्थनीय है
+              </p>
+            </div>
+
+            <!-- Couple Names -->
+            <div class="print-couple-section">
+              <div class="print-groom-name">Harsh <span class="print-hindi-name">(हर्ष)</span></div>
+              <div class="print-conjunction">&amp;</div>
+              <div class="print-bride-name">Monika <span class="print-hindi-name">(मोनिका)</span></div>
+            </div>
+
+            <!-- Auspicious Details -->
+            <div class="print-card-details">
+              <div class="print-detail-item">
+                <span class="print-detail-icon">📅</span>
+                <div class="print-detail-text">
+                  <strong>Wednesday, 25 November 2026</strong>
+                  <span>बुधवार, २५ नवंबर २०२६</span>
+                </div>
+              </div>
+
+              <div class="print-detail-item">
+                <span class="print-detail-icon">⏰</span>
+                <div class="print-detail-text">
+                  <strong>Auspicious Muhurat &bull; 7:00 PM IST</strong>
+                  <span>शुभ विवाह लग्न: सायं ७:०० बजे</span>
+                </div>
+              </div>
+
+              <div class="print-detail-item">
+                <span class="print-detail-icon">🏛️</span>
+                <div class="print-detail-text">
+                  <strong>THE ROYAL AVENUE</strong>
+                  <span>Beside Vijay farms, Bhadesi Mafi, Aligarh, Uttar Pradesh 202002</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer Blessing on Card -->
+            <div class="print-card-footer">
+              <div class="print-footer-chant">॥ सब्वे सत्ता सुखी होन्तु ॥</div>
+              <p class="print-footer-trans">“May all beings abide in peace, harmony, and joy.”</p>
+              <div class="print-inviting-by">Cordially Invited by: <strong>Both Families (समस्त परिवार)</strong></div>
+            </div>
+          </div>
         </div>
 
-        <!-- RSVP Status Alert Box -->
-        <div id="rsvpStatusMessage" class="rsvp-status-message"></div>
-
-        <!-- Form -->
-        <form id="rsvpForm" class="rsvp-form" novalidate>
-          <div class="form-group">
-            <label class="form-label" for="guestName">
-              Full Name &bull; पूरा नाम <span class="required">*</span>
-            </label>
-            <input type="text" id="guestName" name="guestName" class="form-input" placeholder="e.g. Ramesh Chandra &amp; Family" required />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="contactInfo">
-              Phone Number or Email &bull; संपर्क नंबर / ईमेल <span class="required">*</span>
-            </label>
-            <input type="text" id="contactInfo" name="contactInfo" class="form-input" placeholder="+91 98765 43210 or email" required />
-          </div>
-
-          <!-- Attendance Options -->
-          <div class="form-group">
-            <label class="form-label">
-              Will You Be Attending? &bull; क्या आप उपस्थित होंगे? <span class="required">*</span>
-            </label>
-            <div class="attendance-options">
-              <label id="optionAccept" class="radio-card selected">
-                <input type="radio" id="radioAccept" name="attendance" value="accept" checked />
-                <span>🌸</span>
-                <span><strong>Joyfully Accept</strong><br><small style="color:var(--text-muted)">सहर्ष उपस्थित होंगे</small></span>
-              </label>
-              <label id="optionDecline" class="radio-card">
-                <input type="radio" id="radioDecline" name="attendance" value="decline" />
-                <span>🕊️</span>
-                <span><strong>Regretfully Decline</strong><br><small style="color:var(--text-muted)">उपस्थिति में असमर्थ</small></span>
-              </label>
+        <!-- Download Action Options -->
+        <div class="download-actions-panel">
+          <div class="download-action-card card-filigree">
+            <div class="action-icon-box">📄</div>
+            <div class="action-details">
+              <h4 class="action-card-title">Download Invitation as PDF</h4>
+              <p class="action-card-desc">
+                Print-ready, vector-sharp A4 PDF with authentic Devanagari Hindi calligraphy, ideal for color printing or framing.
+              </p>
+              <button id="btnDownloadPdf" class="btn btn-gold btn-download-action" type="button">
+                <span class="btn-icon">📄</span>
+                <span class="btn-label">Download Invitation as PDF</span>
+              </button>
             </div>
           </div>
 
-          <!-- Number of Guests -->
-          <div id="guestsCountGroup" class="form-group">
-            <label class="form-label" for="guestsCount">
-              Number of Attendees &bull; कुल सदस्य
-            </label>
-            <select id="guestsCount" name="guestsCount" class="form-select">
-              <option value="1">1 Guest (१ सदस्य)</option>
-              <option value="2" selected>2 Guests (२ सदस्य)</option>
-              <option value="3">3 Guests (३ सदस्य)</option>
-              <option value="4">4 Guests (४ सदस्य)</option>
-              <option value="5">5 Guests (५ सदस्य)</option>
-              <option value="6">6+ Guests (६ से अधिक सदस्य)</option>
-            </select>
+          <div class="download-action-card card-filigree">
+            <div class="action-icon-box">🖼️</div>
+            <div class="action-details">
+              <h4 class="action-card-title">Download Invitation as Image</h4>
+              <p class="action-card-desc">
+                High-definition PNG graphic formatted perfectly for sharing directly to WhatsApp Status, Instagram, or family groups.
+              </p>
+              <button id="btnDownloadImage" class="btn btn-royal btn-download-action" type="button">
+                <span class="btn-icon">🖼️</span>
+                <span class="btn-label">Download Invitation as Image</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Optional Message -->
-          <div class="form-group">
-            <label class="form-label" for="guestMessage">
-              Blessing or Message for Harsh &amp; Monika &bull; मंगलकामनाएं (Optional)
-            </label>
-            <textarea id="guestMessage" name="guestMessage" rows="3" class="form-textarea" placeholder="Share your warm wishes, prayers, or message for the couple..."></textarea>
-          </div>
-
-          <button id="btnSubmitRsvp" type="submit" class="btn btn-gold" style="width: 100%; padding: 0.95rem;">
-            <span>Confirm RSVP &bull; उपस्थिति पुष्टि करें</span>
-          </button>
-        </form>
-
-        <!-- RSVP Success Confirmation Box -->
-        <div id="rsvpSuccessBox" style="display: none; text-align: center; padding: 2rem 1rem;">
-          <div style="width: 70px; height: 70px; margin: 0 auto 1.25rem; border-radius: 50%; background: rgba(212, 175, 55, 0.2); border: 2px solid var(--gold-primary); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-            🌸
-          </div>
-          <h3 style="font-size: 1.85rem; color: var(--gold-bright); margin-bottom: 0.5rem;">
-            Thank You, <span id="successGuestName"></span>!
-          </h3>
-          <p id="successStatusNote" style="font-family: var(--font-serif-body); font-style: italic; font-size: 1.15rem; color: var(--white-cream); max-width: 500px; margin: 0 auto 1.5rem; line-height: 1.6;">
-            Your response has been recorded with joy.
-          </p>
-          <div style="font-family: var(--font-devanagari); font-size: 1.2rem; color: var(--gold-primary); font-weight: 700; margin-bottom: 1.5rem;">
-            ॥ सब्वे सत्ता सुखी होन्तु ॥
-          </div>
-          <button id="btnEditRsvp" class="btn btn-outline-gold" style="font-size: 0.78rem;">
-            Update Response / पुन: संशोधन करें
-          </button>
+          <!-- Download Status Indicator -->
+          <div id="downloadStatusNotice" class="download-status-notice" style="display: none;"></div>
         </div>
       </div>
     </section>
@@ -896,6 +1001,19 @@
       <div class="footer-copyright">
         🌸 Dedicated with devotion &bull; Indian Buddhist Wedding Celebration &bull; Aligarh, Uttar Pradesh 🌸
       </div>
+
+      <!-- Creator Credit (Configurable in CONFIG.creator in script.js) -->
+      <div id="creatorCredit" class="creator-credit-section">
+        <div class="creator-text">
+          <span id="creatorRole">Designed &amp; Developed with ❤️</span> by 
+          <strong id="creatorName" class="creator-name">A.K. Bardhan</strong>
+        </div>
+        <!-- <div id="creatorSocialLinks" class="creator-social-links">
+          <a href="https://github.com/dilipk2026" target="_blank" rel="noopener noreferrer" class="creator-link">
+            <span>💻</span><span>GitHub</span>
+          </a>
+        </div> -->
+      </div>
     </div>
   </footer>
 
@@ -905,9 +1023,10 @@
   <!-- Three.js (r128) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  <!-- GSAP & ScrollTrigger -->
+  <!-- GSAP, ScrollTrigger & ScrollToPlugin -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
 
   <!-- Main JavaScript File -->
   <script src="script.js"></script>
